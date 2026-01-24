@@ -141,6 +141,17 @@ jobs:
       - name: Load Custom Script
         run: chmod +x $DIY_SCRIPT && ./$DIY_SCRIPT
 
+      - name: Disable rust download-ci-llvm
+        run: |
+          set -eux
+          # 找到 rust 的 bootstrap.toml 或模板
+          find feeds/packages/lang/rust -type f -name "bootstrap.toml*" -print
+      
+          # 常见路径（ImmortalWrt / OpenWrt 通用）
+          if [ -f feeds/packages/lang/rust/files/bootstrap.toml ]; then
+            echo -e "\n[llvm]\ndownload-ci-llvm = false\n" >> feeds/packages/lang/rust/files/bootstrap.toml
+          fi
+
       - name: Compile Toolchain
         if: env.REBUILD_TOOLCHAIN == 'true'
         id: toolchain
