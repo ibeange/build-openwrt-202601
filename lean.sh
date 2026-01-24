@@ -305,38 +305,53 @@ add_custom_packages() {
     [ -d "$destination_dir" ] || mkdir -p "$destination_dir"
 
     # 基础插件
-    git_clone https://github.com/kongfl888/luci-app-adguardhome
+    # git_clone https://github.com/kongfl888/luci-app-adguardhome
     clone_all lua https://github.com/sirpdboy/luci-app-ddns-go
-    clone_dir lua https://github.com/sbwml/luci-app-alist luci-app-alist
+    # clone_dir lua https://github.com/sbwml/luci-app-alist luci-app-alist
     clone_all v5-lua https://github.com/sbwml/luci-app-mosdns
     git_clone https://github.com/sbwml/packages_lang_golang golang
     git_clone lede https://github.com/pymumu/luci-app-smartdns
     git_clone https://github.com/pymumu/openwrt-smartdns smartdns
     git_clone https://github.com/ximiTech/luci-app-msd_lite
     git_clone https://github.com/ximiTech/msd_lite
-    clone_all https://github.com/linkease/istore-ui
-    clone_all https://github.com/linkease/istore luci
+    # clone_all https://github.com/linkease/istore-ui
+    # clone_all https://github.com/linkease/istore luci
+
+    # UU游戏加速器
+    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster
+    clone_dir https://github.com/kiddin9/kwrt-packages uugamebooster
+
+    # 关机
+    clone_all https://github.com/sirpdboy/luci-app-poweroffdevice
+    
+    # luci-app-filemanager
+    git_clone https://github.com/sbwml/luci-app-filemanager luci-app-filemanager
+    
+    # 添加 Turbo ACC 网络加速
+    # git_clone https://github.com/kiddin9/kwrt-packages luci-app-turboacc
 
     # 科学上网插件
-    clone_all https://github.com/fw876/helloworld
-    clone_all https://github.com/Openwrt-Passwall/openwrt-passwall-packages
-    clone_all https://github.com/Openwrt-Passwall/openwrt-passwall
-    clone_all https://github.com/Openwrt-Passwall/openwrt-passwall2
+    # clone_all https://github.com/fw876/helloworld
+    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall-packages
+    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall
+    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall2
     clone_dir https://github.com/vernesong/OpenClash luci-app-openclash
     clone_dir https://github.com/sbwml/openwrt_helloworld xray-core
+    clone_all https://github.com/nikkinikki-org/OpenWrt-nikki
+    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-v2ray-server
 
     # Themes
     git_clone 18.06 https://github.com/kiddin9/luci-theme-edge
     git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
     git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
-    clone_dir https://github.com/xiaoqingfengATGH/luci-theme-infinityfreedom luci-theme-infinityfreedom-ng
-    clone_dir https://github.com/haiibo/packages luci-theme-opentomcat
+    # clone_dir https://github.com/xiaoqingfengATGH/luci-theme-infinityfreedom luci-theme-infinityfreedom-ng
+    # clone_dir https://github.com/haiibo/packages luci-theme-opentomcat
 
     # 晶晨宝盒
-    clone_all https://github.com/ophub/luci-app-amlogic
-    sed -i "s|firmware_repo.*|firmware_repo 'https://github.com/$GITHUB_REPOSITORY'|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
+    # clone_all https://github.com/ophub/luci-app-amlogic
+    # sed -i "s|firmware_repo.*|firmware_repo 'https://github.com/$GITHUB_REPOSITORY'|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
     # sed -i "s|kernel_path.*|kernel_path 'https://github.com/ophub/kernel'|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
-    sed -i "s|ARMv8|$RELEASE_TAG|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
+    # sed -i "s|ARMv8|$RELEASE_TAG|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
 
     # 修复Makefile路径
     find "$destination_dir" -type f -name "Makefile" | xargs sed -i \
@@ -374,19 +389,75 @@ apply_custom_settings() {
     # ttyd免登录
     sed -i 's|/bin/login|/bin/login -f root|g' feeds/packages/utils/ttyd/files/ttyd.config
 
-    # 设置root用户密码为空
-    # sed -i '/CYXluq4wUazHjmCDBCqXF/d' package/lean/default-settings/files/zzz-default-settings 
+    # 设置 root 用户密码为 password
+    sed -i 's/root:::0:99999:7:::/root:$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.::0:99999:7:::/g' package/base-files/files/etc/shadow
     
     # 更改argon主题背景
     cp -f $GITHUB_WORKSPACE/images/bg1.jpg feeds/luci/themes/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+
+    echo "菜单 调整..."
+    sed -i 's|/services/|/control/|' feeds/luci/applications/luci-app-wol/root/usr/share/luci/menu.d/luci-app-wol.json
+    #sed -i 's|/services/|/network/|' feeds/luci/applications/luci-app-nlbwmon/root/usr/share/luci/menu.d/luci-app-nlbwmon.json
+    #sed -i 's|/services/|/nas/|' feeds/luci/applications/luci-app-alist/root/usr/share/luci/menu.d/luci-app-openlist2.json
+    sed -i '/"title": "Nikki",/a \        "order": -9,' package/waynesg/luci-app-nikki/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json
+    sed -i 's/("OpenClash"), 50)/("OpenClash"), -10)/g' feeds/luci/applications/luci-app-openclash/luasrc/controller/openclash.lua
+    sed -i 's/"网络存储"/"存储"/g' `grep "网络存储" -rl ./`
+    sed -i 's/"软件包"/"软件管理"/g' `grep "软件包" -rl ./`
+
+    # 重命名
+    sed -i 's,UPnP IGD 和 PCP,UPnP,g' feeds/luci/applications/luci-app-upnp/po/zh_Hans/upnp.po
+        
+    echo "重命名系统菜单"
+    #status menu
+    sed -i 's/"概览"/"系统概览"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"路由"/"路由映射"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    #system menu
+    sed -i 's/"系统"/"系统设置"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"管理权"/"权限管理"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"重启"/"立即重启"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"备份与升级"/"备份升级"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"挂载点"/"挂载路径"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"启动项"/"启动管理"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"软件包"/"软件管理"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+
+    # 精简 UPnP 菜单名称
+    sed -i 's#\"title\": \"UPnP IGD \& PCP/NAT-PMP\"#\"title\": \"UPnP服务\"#g' feeds/luci/applications/luci-app-upnp/root/usr/share/luci/menu.d/luci-app-upnp.json
+    
+    # 更改 ttyd 顺序和名称
+    sed -i '3a \		"order": 10,' feeds/luci/applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json
+    sed -i 's/"终端"/"命令终端"/g' feeds/luci/applications/luci-app-ttyd/po/zh_Hans/ttyd.po
+    
+    # 设置 nlbwmon 独立菜单
+    sed -i 's/524288/16777216/g' feeds/packages/net/nlbwmon/files/nlbwmon.config
+    sed -i 's/option commit_interval.*/option commit_interval 24h/g' feeds/packages/net/nlbwmon/files/nlbwmon.config
+    sed -i 's/services\/nlbw/nlbw/g; /path/s/admin\///g' feeds/luci/applications/luci-app-nlbwmon/root/usr/share/luci/menu.d/luci-app-nlbwmon.json
+    sed -i 's/services\///g' feeds/luci/applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js
+    
+    echo "重命名网络菜单"
+    #network
+    sed -i 's/"接口"/"网络接口"/g' `grep "接口" -rl ./`
+    sed -i 's/DHCP\/DNS/DNS设定/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 
     # x86型号只显示cpu型号
     sed -i 's/${g}.*/${a}${b}${c}${d}${e}${f}${hydrid}/g' package/lean/autocore/files/x86/autocore
     sed -i "s/'C'/'Core '/g; s/'T '/'Thread '/g" package/lean/autocore/files/x86/autocore
 
+    # 最大连接数修改为65535
+    sed -i '$a net.netfilter.nf_conntrack_max=65535' package/base-files/files/etc/sysctl.conf
+    
+    # 修改本地时间格式
+    sed -i 's/os.date()/os.date("%a %Y-%m-%d %H:%M:%S")/g' package/emortal/autocore/files/*/index.htm
+    
+    #nlbwmon 修复log警报
+    sed -i '$a net.core.wmem_max=16777216' package/base-files/files/etc/sysctl.conf
+    sed -i '$a net.core.rmem_max=16777216' package/base-files/files/etc/sysctl.conf
+
     # 修改版本为编译日期
-    orig_version=$(awk -F "'" '/DISTRIB_REVISION=/{print $2}' package/lean/default-settings/files/zzz-default-settings)
-    sed -i "s/$orig_version/R$(date +%y.%-m.%-d)/g" package/lean/default-settings/files/zzz-default-settings
+    # orig_version=$(awk -F "'" '/DISTRIB_REVISION=/{print $2}' package/lean/default-settings/files/zzz-default-settings)
+    # sed -i "s/$orig_version/R$(date +%y.%-m.%-d)/g" package/lean/default-settings/files/zzz-default-settings
+    sed -i "s/DISTRIB_DESCRIPTION=.*/DISTRIB_DESCRIPTION=\"OpenWrt By @Ethan\"/g" package/base-files/files/etc/openwrt_release
+    sed -i "s/OPENWRT_RELEASE=.*/OPENWRT_RELEASE=\"OpenWrt R$(TZ=UTC-8 date +'%y.%-m.%-d') (By @Ethan build $(TZ=UTC-8 date '+%Y-%m-%d %H:%M'))\"/g" package/lean/default-settings/files/zzz-default-settings
+    echo -e "\e[41m当前写入的编译时间:\e[0m \e[33m$(grep 'OPENWRT_RELEASE' package/base-files/files/usr/lib/os-release)\e[0m"
 
     # 删除主题默认设置
     # find $destination_dir/luci-theme-*/ -type f -name '*luci-theme-*' -exec sed -i '/set luci.main.mediaurlbase/d' {} +
