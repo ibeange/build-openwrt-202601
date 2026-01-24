@@ -72,7 +72,7 @@ on:
 jobs:
   build:
     name: build ${{inputs.target}} ${{inputs.source}}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     env:
       IP_ADDRESS: ${{inputs.ip_address}}
