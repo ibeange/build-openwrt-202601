@@ -304,43 +304,53 @@ add_custom_packages() {
     [ -d "$destination_dir" ] || mkdir -p "$destination_dir"
 
     # 基础插件
-    clone_dir openwrt-23.05 https://github.com/coolsnowwolf/luci luci-app-adguardhome
+    # clone_dir openwrt-23.05 https://github.com/coolsnowwolf/luci luci-app-adguardhome
     clone_all https://github.com/lwb1978/openwrt-gecoosac
     clone_dir https://github.com/sirpdboy/luci-app-ddns-go ddns-go luci-app-ddns-go
-    clone_all https://github.com/sbwml/luci-app-alist
+    # clone_all https://github.com/sbwml/luci-app-alist
     clone_all https://github.com/sbwml/luci-app-mosdns
     git_clone https://github.com/sbwml/packages_lang_golang golang
-    clone_all https://github.com/linkease/istore-ui
-    clone_all https://github.com/linkease/istore luci
+    # clone_all https://github.com/linkease/istore-ui
+    # clone_all https://github.com/linkease/istore luci
     clone_all https://github.com/brvphoenix/luci-app-wrtbwmon
     clone_all https://github.com/brvphoenix/wrtbwmon
 
     # 科学上网插件
-    clone_all https://github.com/fw876/helloworld
-    clone_all https://github.com/Openwrt-Passwall/openwrt-passwall-packages
-    clone_all https://github.com/Openwrt-Passwall/openwrt-passwall
-    clone_all https://github.com/Openwrt-Passwall/openwrt-passwall2
+    # clone_all https://github.com/fw876/helloworld
+    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall-packages
+    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall
+    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall2
     clone_dir https://github.com/vernesong/OpenClash luci-app-openclash
     clone_all https://github.com/nikkinikki-org/OpenWrt-nikki
-    clone_all https://github.com/nikkinikki-org/OpenWrt-momo
-    clone_dir https://github.com/QiuSimons/luci-app-daed daed luci-app-daed
-    git_clone https://github.com/immortalwrt/homeproxy luci-app-homeproxy
+    # clone_all https://github.com/nikkinikki-org/OpenWrt-momo
+    # clone_dir https://github.com/QiuSimons/luci-app-daed daed luci-app-daed
+    # git_clone https://github.com/immortalwrt/homeproxy luci-app-homeproxy
     clone_dir https://github.com/sbwml/openwrt_helloworld xray-core
+
+    # UU游戏加速器
+    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster
+    clone_dir https://github.com/kiddin9/kwrt-packages uugamebooster
+
+    # 关机
+    clone_all https://github.com/sirpdboy/luci-app-poweroffdevice
+
+    # luci-app-filemanager
+    git_clone https://github.com/sbwml/luci-app-filemanager luci-app-filemanager
 
     # Themes
     git_clone https://github.com/kiddin9/luci-theme-edge
     git_clone https://github.com/jerrykuku/luci-theme-argon
     git_clone https://github.com/jerrykuku/luci-app-argon-config
-    git_clone https://github.com/eamonxg/luci-theme-aurora
-    git_clone https://github.com/eamonxg/luci-app-aurora-config
-    git_clone https://github.com/sirpdboy/luci-theme-kucat
-    git_clone https://github.com/sirpdboy/luci-app-kucat-config
+    # git_clone https://github.com/eamonxg/luci-theme-aurora
+    # git_clone https://github.com/eamonxg/luci-app-aurora-config
+    # git_clone https://github.com/sirpdboy/luci-theme-kucat
+    # git_clone https://github.com/sirpdboy/luci-app-kucat-config
 
     # 晶晨宝盒
-    clone_all https://github.com/ophub/luci-app-amlogic
-    sed -i "s|firmware_repo.*|firmware_repo 'https://github.com/$GITHUB_REPOSITORY'|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
+    # clone_all https://github.com/ophub/luci-app-amlogic
+    # sed -i "s|firmware_repo.*|firmware_repo 'https://github.com/$GITHUB_REPOSITORY'|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
     # sed -i "s|kernel_path.*|kernel_path 'https://github.com/ophub/kernel'|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
-    sed -i "s|ARMv8|$RELEASE_TAG|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
+    # sed -i "s|ARMv8|$RELEASE_TAG|g" $destination_dir/luci-app-amlogic/root/etc/config/amlogic
 
     # 修复Makefile路径
     find "$destination_dir" -type f -name "Makefile" | xargs sed -i \
@@ -390,6 +400,54 @@ apply_custom_settings() {
     # 设置nlbwmon独立菜单
     sed -i 's/services\/nlbw/nlbw/g; /path/s/admin\///g' feeds/luci/applications/luci-app-nlbwmon/root/usr/share/luci/menu.d/luci-app-nlbwmon.json
     sed -i 's/services\///g' feeds/luci/applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js
+
+    echo "重命名系统菜单"
+    #status menu
+    sed -i 's/"概览"/"系统概览"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"路由"/"路由映射"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    #system menu
+    sed -i 's/"系统"/"系统设置"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"管理权"/"权限管理"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"重启"/"立即重启"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"备份与升级"/"备份升级"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"挂载点"/"挂载路径"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"启动项"/"启动管理"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/"软件包"/"软件管理"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's#\"title\": \"UPnP IGD \& PCP/NAT-PMP\"#\"title\": \"UPnP服务\"#g' feeds/luci/applications/luci-app-upnp/root/usr/share/luci/menu.d/luci-app-upnp.json
+
+    # 更改 ttyd 顺序和名称
+    sed -i '3a \		"order": 10,' feeds/luci/applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json
+    sed -i 's/"终端"/"命令终端"/g' feeds/luci/applications/luci-app-ttyd/po/zh_Hans/ttyd.po
+
+    echo "重命名网络菜单"
+    #network
+    sed -i 's/"接口"/"网络接口"/g' `grep "接口" -rl ./`
+    sed -i 's/DHCP\/DNS/DNS设定/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+
+    # x86 型号只显示 CPU 型号
+    sed -i 's/${g}.*/${a}${b}${c}${d}${e}${f}${hydrid}/g' package/emortal/autocore/files/x86/autocore
+    
+    # 最大连接数修改为65535
+    sed -i '$a net.netfilter.nf_conntrack_max=65535' package/base-files/files/etc/sysctl.conf
+    
+    # 修改本地时间格式
+    sed -i 's/os.date()/os.date("%a %Y-%m-%d %H:%M:%S")/g' package/emortal/autocore/files/*/index.htm
+    
+    #nlbwmon 修复log警报
+    sed -i '$a net.core.wmem_max=16777216' package/base-files/files/etc/sysctl.conf
+    sed -i '$a net.core.rmem_max=16777216' package/base-files/files/etc/sysctl.conf
+    
+    # 调整 V2ray服务器 到 VPN 菜单 (修正路径)
+    if [ -d "package/A/luci-app-v2ray-server" ]; then
+        sed -i 's/services/vpn/g' package/A/luci-app-v2ray-server/luasrc/controller/*.lua
+        sed -i 's/services/vpn/g' package/A/luci-app-v2ray-server/luasrc/model/cbi/v2ray_server/*.lua
+        sed -i 's/services/vpn/g' package/A/luci-app-v2ray-server/luasrc/view/v2ray_server/*.htm
+    fi
+    
+    # 显示增加编译时间
+    sed -i "s/DISTRIB_DESCRIPTION=.*/DISTRIB_DESCRIPTION=\"ImmortalWrt By @Ethan\"/g" package/base-files/files/etc/openwrt_release
+    sed -i "s/OPENWRT_RELEASE=.*/OPENWRT_RELEASE=\"ImmortalWrt R$(TZ=UTC-8 date +'%y.%-m.%-d') (By @Ethan build $(TZ=UTC-8 date '+%Y-%m-%d %H:%M'))\"/g" package/base-files/files/usr/lib/os-release
+    echo -e "\e[41m当前写入的编译时间:\e[0m \e[33m$(grep 'OPENWRT_RELEASE' package/base-files/files/usr/lib/os-release)\e[0m"
 
     # 修改qca-nss-drv启动顺序
     drv_path="feeds/nss_packages/qca-nss-drv/files/qca-nss-drv.init"
