@@ -293,6 +293,7 @@ download_toolchain() {
 update_install_feeds() {
     ./scripts/feeds update -a 1>/dev/null 2>&1
     ./scripts/feeds install -a 1>/dev/null 2>&1
+    sed -i 's/ci-llvm=true/ci-llvm=false/g' feeds/packages/lang/rust/Makefile
 }
 
 # 添加额外插件
