@@ -322,31 +322,43 @@ add_custom_packages() {
     git_clone https://github.com/ximiTech/luci-app-msd_lite
     git_clone https://github.com/ximiTech/msd_lite
 
+    # openclash
+    rm -rf feeds/luci/applications/luci-app-openclash
+    clone_dir https://github.com/vernesong/OpenClash luci-app-openclash
+    sed -i 's|("OpenClash"), 50)|("OpenClash"), 3)|g' package/luci-app-openclash/luasrc/controller/*.lua
 
+    # v2ray-server
+    rm -rf feeds/luci/applications/luci-app-v2ray-server
+    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-v2ray-server
+    clone_dir https://github.com/sbwml/openwrt_helloworld xray-core
+    # 调整 V2ray服务器 到 VPN 菜单 (修正路径)
+    if [ -d "package/luci-app-v2ray-server" ]; then
+        sed -i 's/services/vpn/g' package/luci-app-v2ray-server/luasrc/controller/*.lua
+        sed -i 's/services/vpn/g' package/luci-app-v2ray-server/luasrc/model/cbi/v2ray_server/*.lua
+        sed -i 's/services/vpn/g' package/luci-app-v2ray-server/luasrc/view/v2ray_server/*.htm
+    fi
+
+    # nikki最新版本
+    rm -rf feeds/luci/applications/luci-app-nikki
+    clone_all https://github.com/nikkinikki-org/OpenWrt-nikki
+    sed -i 's/"title": "Nikki",/&\n        "order": 1,/g' package/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json
 
     # UU游戏加速器
-    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster
-    clone_dir https://github.com/kiddin9/kwrt-packages uugamebooster
+    rm -rf feeds/luci/applications/luci-app-uugamebooster
+    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster/luci-app-uugamebooster
+    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster/uugamebooster
 
     # 关机
     clone_all https://github.com/sirpdboy/luci-app-poweroffdevice
+
+    # Lucky
+    clone_all https://github.com/sirpdboy/luci-app-lucky
     
     # luci-app-filemanager
     git_clone https://github.com/sbwml/luci-app-filemanager luci-app-filemanager
     
     # 添加 Turbo ACC 网络加速
     git_clone https://github.com/kiddin9/kwrt-packages luci-app-turboacc
-
-    # 科学上网插件
-    # clone_all https://github.com/fw876/helloworld
-    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall-packages
-    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall
-    # clone_all https://github.com/Openwrt-Passwall/openwrt-passwall2
-
-    clone_dir https://github.com/vernesong/OpenClash luci-app-openclash
-    clone_dir https://github.com/sbwml/openwrt_helloworld xray-core
-    clone_all https://github.com/nikkinikki-org/OpenWrt-nikki
-    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-v2ray-server
 
     # Themes
     git_clone https://github.com/jerrykuku/luci-theme-argon
@@ -402,13 +414,27 @@ apply_custom_settings() {
     
     # 更改argon主题背景
     cp -f $GITHUB_WORKSPACE/images/bg1.jpg feeds/luci/themes/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+    ARGON_CONFIG_FILE="feeds/luci/applications/luci-app-argon-config/root/etc/config/argon"
+    if [ -f "$ARGON_CONFIG_FILE" ]; then
+        # 设置Argon主题的登录页面壁纸为内建
+        sed -i "s/option online_wallpaper 'bing'/option online_wallpaper 'none'/" $ARGON_CONFIG_FILE
+        # 设置Argon主题的登录表单模糊度
+        sed -i "s/option blur '[0-9]*'/option blur '0'/" $ARGON_CONFIG_FILE
+        sed -i "s/option blur_dark '[0-9]*'/option blur_dark '0'/" $ARGON_CONFIG_FILE
+        # 设置Argon主题颜色
+        PRIMARY_COLORS=("#FF8C00" "#1E90FF" "#FF69B4" "#FF1493" "#e2c312" "#00CED1" "#DC143C")
+        DARK_PRIMARY_COLORS=("#9370DB" "#8A2BE2" "#D87093" "#C71585" "#B8860B" "#4682B4" "#8B0000")
+        WEEKDAY=$(date +%w)
+        sed -i "s/option primary '#[0-9a-fA-F]\{6\}'/option primary '${PRIMARY_COLORS[$WEEKDAY]}'/" $ARGON_CONFIG_FILE
+        sed -i "s/option dark_primary '#[0-9a-fA-F]\{6\}'/option dark_primary '${DARK_PRIMARY_COLORS[$WEEKDAY]}'/" $ARGON_CONFIG_FILE
+
+        echo "argon theme has been customized!"
+    fi
 
     echo "菜单 调整..."
     # sed -i 's|/services/|/control/|' feeds/luci/applications/luci-app-wol/root/usr/share/luci/menu.d/luci-app-wol.json
     #sed -i 's|/services/|/network/|' feeds/luci/applications/luci-app-nlbwmon/root/usr/share/luci/menu.d/luci-app-nlbwmon.json
     #sed -i 's|/services/|/nas/|' feeds/luci/applications/luci-app-alist/root/usr/share/luci/menu.d/luci-app-openlist2.json
-    sed -i '/"title": "Nikki",/a \        "order": -9,' package/waynesg/luci-app-nikki/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json
-    sed -i 's/("OpenClash"), 50)/("OpenClash"), -10)/g' feeds/luci/applications/luci-app-openclash/luasrc/controller/openclash.lua
     sed -i 's/"网络存储"/"存储"/g' `grep "网络存储" -rl ./`
     sed -i 's/"软件包"/"软件管理"/g' `grep "软件包" -rl ./`
 
@@ -429,14 +455,14 @@ apply_custom_settings() {
     sed -i 's/"软件包"/"软件管理"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
     
     # 更改 ttyd 顺序和名称
-    sed -i '3a \		"order": 10,' feeds/luci/applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json
-    sed -i 's/"终端"/"命令终端"/g' feeds/luci/applications/luci-app-ttyd/po/zh-cn/ttyd.po
+    #sed -i '3a \		"order": 10,' feeds/luci/applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json
+    sed -i 's/"终端"/"命令终端"/g' feeds/luci/applications/luci-app-ttyd/po/zh-cn/terminal.po
     
     # 设置 nlbwmon 独立菜单
-    sed -i 's/524288/16777216/g' feeds/packages/net/nlbwmon/files/nlbwmon.config
-    sed -i 's/option commit_interval.*/option commit_interval 24h/g' feeds/packages/net/nlbwmon/files/nlbwmon.config
-    sed -i 's/services\/nlbw/nlbw/g; /path/s/admin\///g' feeds/luci/applications/luci-app-nlbwmon/root/usr/share/luci/menu.d/luci-app-nlbwmon.json
-    sed -i 's/services\///g' feeds/luci/applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js
+    #sed -i 's/524288/16777216/g' feeds/packages/net/nlbwmon/files/nlbwmon.config
+    #sed -i 's/option commit_interval.*/option commit_interval 24h/g' feeds/packages/net/nlbwmon/files/nlbwmon.config
+    #sed -i 's/services\/nlbw/nlbw/g; /path/s/admin\///g' feeds/luci/applications/luci-app-nlbwmon/root/usr/share/luci/menu.d/luci-app-nlbwmon.json
+    #sed -i 's/services\///g' feeds/luci/applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js
     
     echo "重命名网络菜单"
     #network
@@ -451,7 +477,7 @@ apply_custom_settings() {
     sed -i '$a net.netfilter.nf_conntrack_max=65535' package/base-files/files/etc/sysctl.conf
     
     # 修改本地时间格式
-    sed -i 's/os.date()/os.date("%a %Y-%m-%d %H:%M:%S")/g' package/emortal/autocore/files/*/index.htm
+    sed -i 's/os.date()/os.date("%a %Y-%m-%d %H:%M:%S")/g' package/lean/autocore/files/*/index.htmm
     
     #nlbwmon 修复log警报
     sed -i '$a net.core.wmem_max=16777216' package/base-files/files/etc/sysctl.conf
@@ -465,6 +491,10 @@ apply_custom_settings() {
     sed -i 's/^VERSION_DIST:=.*/VERSION_DIST:=Ethan/' include/version.mk
     sed -i "s/OPENWRT_RELEASE=.*/OPENWRT_RELEASE=\"Ethan R$(TZ=UTC-8 date +'%y.%-m.%-d')\"/g" package/lean/default-settings/files/zzz-default-settings
     echo -e "\e[41m当前写入的编译时间:\e[0m \e[33m$(grep 'OPENWRT_RELEASE' package/base-files/files/usr/lib/os-release)\e[0m"
+
+    # 修改欢迎banner
+    sed -i "/\\   DE \//s/$/  [31mBy @Ethan build $(TZ=UTC-8 date '+%Y.%m.%d')[0m/" package/base-files/files/etc/banner
+    cat package/base-files/files/etc/banner
 
     # 删除主题默认设置
     # find $destination_dir/luci-theme-*/ -type f -name '*luci-theme-*' -exec sed -i '/set luci.main.mediaurlbase/d' {} +
