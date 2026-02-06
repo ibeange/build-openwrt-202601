@@ -360,7 +360,7 @@ add_custom_packages() {
     git_clone https://github.com/sbwml/luci-app-filemanager luci-app-filemanager
     
     # 添加 Turbo ACC 网络加速
-    git_clone https://github.com/kiddin9/kwrt-packages luci-app-turboacc
+    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-turboacc
 
     # Themes
     git_clone https://github.com/jerrykuku/luci-theme-argon
