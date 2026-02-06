@@ -325,23 +325,25 @@ add_custom_packages() {
     # openclash
     rm -rf feeds/luci/applications/luci-app-openclash
     clone_dir https://github.com/vernesong/OpenClash luci-app-openclash
-    sed -i 's|("OpenClash"), 50)|("OpenClash"), 3)|g' package/luci-app-openclash/luci-app-nikki/luasrc/controller/*.lua
+    oc_ctrl_dir=$(find package feeds -path "*/luci-app-openclash/luasrc/controller" -print -quit 2>/dev/null)
+    [ -n "$oc_ctrl_dir" ] && sed -i 's|("OpenClash"), 50)|("OpenClash"), 3)|g' "$oc_ctrl_dir"/*.lua
+
 
     # v2ray-server
     rm -rf feeds/luci/applications/luci-app-v2ray-server
     clone_dir https://github.com/kiddin9/kwrt-packages luci-app-v2ray-server
     clone_dir https://github.com/sbwml/openwrt_helloworld xray-core
     # 调整 V2ray服务器 到 VPN 菜单 (修正路径)
-    if [ -d "package/luci-app-v2ray-server" ]; then
-        sed -i 's/services/vpn/g' package/luci-app-v2ray-server/luasrc/controller/*.lua
-        sed -i 's/services/vpn/g' package/luci-app-v2ray-server/luasrc/model/cbi/v2ray_server/*.lua
-        sed -i 's/services/vpn/g' package/luci-app-v2ray-server/luasrc/view/v2ray_server/*.htm
-    fi
+    v2_dir=$(find package feeds -path "*/luci-app-v2ray-server/luasrc" -print -quit 2>/dev/null)
+    [ -n "$v2_dir" ] && sed -i 's/services/vpn/g' "$v2_dir"/controller/*.lua
+    [ -n "$v2_dir" ] && sed -i 's/services/vpn/g' "$v2_dir"/model/cbi/v2ray_server/*.lua
+    [ -n "$v2_dir" ] && sed -i 's/services/vpn/g' "$v2_dir"/view/v2ray_server/*.htm
 
     # nikki最新版本
     rm -rf feeds/luci/applications/luci-app-nikki
     clone_all https://github.com/nikkinikki-org/OpenWrt-nikki
-    sed -i 's/"title": "Nikki",/&\n        "order": 1,/g' package/luci-app-nikki/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json
+    nikki_dir=$(find package feeds -path "*/luci-app-nikki/root" -print -quit 2>/dev/null)
+    [ -n "$nikki_dir" ] && sed -i 's/"title": "Nikki",/&\n        "order": 1,/g' "$nikki_dir"/usr/share/luci/menu.d/luci-app-nikki.json
 
     # UU游戏加速器
     rm -rf feeds/luci/applications/luci-app-uugamebooster
