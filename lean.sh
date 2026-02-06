@@ -328,7 +328,7 @@ add_custom_packages() {
     git_clone https://github.com/sbwml/luci-app-filemanager luci-app-filemanager
     
     # 添加 Turbo ACC 网络加速
-    # git_clone https://github.com/kiddin9/kwrt-packages luci-app-turboacc
+    git_clone https://github.com/kiddin9/kwrt-packages luci-app-turboacc
 
     # 科学上网插件
     # clone_all https://github.com/fw876/helloworld
@@ -341,9 +341,8 @@ add_custom_packages() {
     clone_dir https://github.com/kiddin9/kwrt-packages luci-app-v2ray-server
 
     # Themes
-    git_clone 18.06 https://github.com/kiddin9/luci-theme-edge
-    git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
-    git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
+    git_clone https://github.com/jerrykuku/luci-theme-argon
+    git_clone https://github.com/jerrykuku/luci-app-argon-config
     # clone_dir https://github.com/xiaoqingfengATGH/luci-theme-infinityfreedom luci-theme-infinityfreedom-ng
     # clone_dir https://github.com/haiibo/packages luci-theme-opentomcat
 
@@ -456,7 +455,7 @@ apply_custom_settings() {
     # orig_version=$(awk -F "'" '/DISTRIB_REVISION=/{print $2}' package/lean/default-settings/files/zzz-default-settings)
     # sed -i "s/$orig_version/R$(date +%y.%-m.%-d)/g" package/lean/default-settings/files/zzz-default-settings
     sed -i "s/DISTRIB_DESCRIPTION=.*/DISTRIB_DESCRIPTION=\"OpenWrt By @Ethan\"/g" package/base-files/files/etc/openwrt_release
-    sed -i "s/OPENWRT_RELEASE=.*/OPENWRT_RELEASE=\"OpenWrt R$(TZ=UTC-8 date +'%y.%-m.%-d') (By @Ethan build $(TZ=UTC-8 date '+%Y-%m-%d %H:%M'))\"/g" package/lean/default-settings/files/zzz-default-settings
+    sed -i "s/OPENWRT_RELEASE=.*/OPENWRT_RELEASE=\"Ethan R$(TZ=UTC-8 date +'%y.%-m.%-d')\"/g" package/lean/default-settings/files/zzz-default-settings
     echo -e "\e[41m当前写入的编译时间:\e[0m \e[33m$(grep 'OPENWRT_RELEASE' package/base-files/files/usr/lib/os-release)\e[0m"
 
     # 删除主题默认设置
