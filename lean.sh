@@ -325,7 +325,7 @@ add_custom_packages() {
     # openclash
     rm -rf feeds/luci/applications/luci-app-openclash
     clone_dir https://github.com/vernesong/OpenClash luci-app-openclash
-    sed -i 's|("OpenClash"), 50)|("OpenClash"), 3)|g' package/luci-app-openclash/luasrc/controller/*.lua
+    sed -i 's|("OpenClash"), 50)|("OpenClash"), 3)|g' package/luci-app-openclash/luci-app-nikki/luasrc/controller/*.lua
 
     # v2ray-server
     rm -rf feeds/luci/applications/luci-app-v2ray-server
@@ -341,12 +341,12 @@ add_custom_packages() {
     # nikki最新版本
     rm -rf feeds/luci/applications/luci-app-nikki
     clone_all https://github.com/nikkinikki-org/OpenWrt-nikki
-    sed -i 's/"title": "Nikki",/&\n        "order": 1,/g' package/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json
+    sed -i 's/"title": "Nikki",/&\n        "order": 1,/g' package/luci-app-nikki/luci-app-nikki/root/usr/share/luci/menu.d/luci-app-nikki.json
 
     # UU游戏加速器
     rm -rf feeds/luci/applications/luci-app-uugamebooster
-    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster/luci-app-uugamebooster
-    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster/uugamebooster
+    clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster
+    clone_dir https://github.com/kiddin9/kwrt-packages uugamebooster
 
     # 关机
     clone_all https://github.com/sirpdboy/luci-app-poweroffdevice
@@ -477,7 +477,7 @@ apply_custom_settings() {
     sed -i '$a net.netfilter.nf_conntrack_max=65535' package/base-files/files/etc/sysctl.conf
     
     # 修改本地时间格式
-    sed -i 's/os.date()/os.date("%a %Y-%m-%d %H:%M:%S")/g' package/lean/autocore/files/*/index.htmm
+    sed -i 's/os.date()/os.date("%a %Y-%m-%d %H:%M:%S")/g' package/lean/autocore/files/*/index.htm
     
     #nlbwmon 修复log警报
     sed -i '$a net.core.wmem_max=16777216' package/base-files/files/etc/sysctl.conf
