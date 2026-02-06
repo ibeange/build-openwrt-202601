@@ -306,16 +306,21 @@ add_custom_packages() {
 
     # 基础插件
     # git_clone https://github.com/kongfl888/luci-app-adguardhome
-    clone_all lua https://github.com/sirpdboy/luci-app-ddns-go
     # clone_dir lua https://github.com/sbwml/luci-app-alist luci-app-alist
-    clone_all v5-lua https://github.com/sbwml/luci-app-mosdns
-    git_clone https://github.com/sbwml/packages_lang_golang golang
-    git_clone lede https://github.com/pymumu/luci-app-smartdns
-    git_clone https://github.com/pymumu/openwrt-smartdns smartdns
-    git_clone https://github.com/ximiTech/luci-app-msd_lite
-    git_clone https://github.com/ximiTech/msd_lite
     # clone_all https://github.com/linkease/istore-ui
     # clone_all https://github.com/linkease/istore luci
+
+    clone_all https://github.com/sirpdboy/luci-app-ddns-go
+
+    clone_all v5 https://github.com/sbwml/luci-app-mosdns
+
+    git_clone https://github.com/pymumu/luci-app-smartdns
+    git_clone https://github.com/pymumu/openwrt-smartdns smartdns
+
+    git_clone https://github.com/sbwml/packages_lang_golang golang
+
+    git_clone https://github.com/ximiTech/luci-app-msd_lite
+    git_clone https://github.com/ximiTech/msd_lite
 
     # UU游戏加速器
     clone_dir https://github.com/kiddin9/kwrt-packages luci-app-uugamebooster
@@ -403,15 +408,15 @@ apply_custom_settings() {
     sed -i 's/"网络存储"/"存储"/g' `grep "网络存储" -rl ./`
     sed -i 's/"软件包"/"软件管理"/g' `grep "软件包" -rl ./`
 
-    # 重命名
-    sed -i 's,UPnP IGD 和 PCP,UPnP,g' feeds/luci/applications/luci-app-upnp/po/zh_Hans/upnp.po
+    # 精简 UPnP 菜单名称
+    sed -i 's,UPnP IGD 和 PCP,UPnP,g' feeds/luci/applications/luci-app-upnp/po/zh-cn/upnp.po
         
     echo "重命名系统菜单"
     #status menu
     sed -i 's/"概览"/"系统概览"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
     sed -i 's/"路由"/"路由映射"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
     #system menu
-    sed -i 's/"系统"/"系统设置"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
+    #sed -i 's/"系统"/"系统设置"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
     sed -i 's/"管理权"/"权限管理"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
     sed -i 's/"重启"/"立即重启"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
     sed -i 's/"备份与升级"/"备份升级"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
@@ -419,12 +424,10 @@ apply_custom_settings() {
     sed -i 's/"启动项"/"启动管理"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
     sed -i 's/"软件包"/"软件管理"/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
 
-    # 精简 UPnP 菜单名称
-    sed -i 's#\"title\": \"UPnP IGD \& PCP/NAT-PMP\"#\"title\": \"UPnP服务\"#g' feeds/luci/applications/luci-app-upnp/root/usr/share/luci/menu.d/luci-app-upnp.json
     
     # 更改 ttyd 顺序和名称
     sed -i '3a \		"order": 10,' feeds/luci/applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json
-    sed -i 's/"终端"/"命令终端"/g' feeds/luci/applications/luci-app-ttyd/po/zh_Hans/ttyd.po
+    sed -i 's/"终端"/"命令终端"/g' feeds/luci/applications/luci-app-ttyd/po/zh-cn/ttyd.po
     
     # 设置 nlbwmon 独立菜单
     sed -i 's/524288/16777216/g' feeds/packages/net/nlbwmon/files/nlbwmon.config
@@ -435,7 +438,7 @@ apply_custom_settings() {
     echo "重命名网络菜单"
     #network
     sed -i 's/"接口"/"网络接口"/g' `grep "接口" -rl ./`
-    sed -i 's/DHCP\/DNS/DNS设定/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+    sed -i 's/DHCP\/DNS/DHCP/g' feeds/luci/modules/luci-base/po/zh-cn/base.po
 
     # x86型号只显示cpu型号
     sed -i 's/${g}.*/${a}${b}${c}${d}${e}${f}${hydrid}/g' package/lean/autocore/files/x86/autocore
@@ -455,6 +458,8 @@ apply_custom_settings() {
     # orig_version=$(awk -F "'" '/DISTRIB_REVISION=/{print $2}' package/lean/default-settings/files/zzz-default-settings)
     # sed -i "s/$orig_version/R$(date +%y.%-m.%-d)/g" package/lean/default-settings/files/zzz-default-settings
     sed -i "s/DISTRIB_DESCRIPTION=.*/DISTRIB_DESCRIPTION=\"OpenWrt By @Ethan\"/g" package/base-files/files/etc/openwrt_release
+    sed -i "s/DISTRIB_ID=.*/DISTRIB_ID='Ethan'/g" package/base-files/files/etc/openwrt_release
+    sed -i 's/^VERSION_DIST:=.*/VERSION_DIST:=Ethan/' include/version.mk
     sed -i "s/OPENWRT_RELEASE=.*/OPENWRT_RELEASE=\"Ethan R$(TZ=UTC-8 date +'%y.%-m.%-d')\"/g" package/lean/default-settings/files/zzz-default-settings
     echo -e "\e[41m当前写入的编译时间:\e[0m \e[33m$(grep 'OPENWRT_RELEASE' package/base-files/files/usr/lib/os-release)\e[0m"
 
